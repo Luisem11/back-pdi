@@ -6,11 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    response = app.response_class(
-        response=json({name="API de procesamientod de imágenes de algas",version="1.0"}),
-        status=200,
-        mimetype='application/json'
-    )
+    response = make_response(jsonify(name="API de procesamiento de imágenes de algas", version="1.0"), 200)
     return response
 @app.route('/ping')
 def pong():
