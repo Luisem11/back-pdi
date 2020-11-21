@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     response = app.response_class(
-        response=jsonify(name="API de procesamientod de imágenes de algas",version="1.0"),
+        response=json({name="API de procesamientod de imágenes de algas",version="1.0"}),
         status=200,
         mimetype='application/json'
     )
