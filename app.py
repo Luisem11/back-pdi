@@ -5,8 +5,8 @@ import os
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-    return '<h1>API para generar rutas temáticas</h1>'
+def home():
+    return jsonify(response_value_1=1,response_value_2="value")
 
 @app.route('/ping')
 def pong():
