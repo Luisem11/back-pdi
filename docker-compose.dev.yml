@@ -1,0 +1,26 @@
+version: "3.2"
+
+services:
+  pdi:
+    image: pdi
+    build:
+      context: .
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 80
+    # command: gunicorn app.main:app --reload -w 1 -k uvicorn.workers.UvicornWorker -b localhost:8100 --timeout 3600 --access-logfile -
+    volumes:
+      - ./:/usr/src/app/
+    ports:
+      - 8100:80
+      - 10010:10002
+    environment:
+      - TESTING=0
+      - DEBUGGER=false
+      - WEB_APP_VERSION=0.0.0
+      - WEB_APP_TITLE=Algaes project
+      - WEB_APP_DESCRIPTION=PDI project
+    networks:
+      - pdi
+
+networks:
+  pdi:
+    external: true
