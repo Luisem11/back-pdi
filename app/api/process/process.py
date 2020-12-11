@@ -6,6 +6,7 @@ from fastapi.responses import StreamingResponse
 import cv2
 import numpy as np
 import io
+from base64 import b64encode
 
 router = APIRouter()
 
@@ -62,4 +63,22 @@ async def process_image(file: UploadFile= File(...)):
 
     # enconde data
     flag, encode = cv2.imencode(f".{extention}", image)        
-    return StreamingResponse(io.BytesIO(encode.tobytes()), media_type=content_type)
+    # return StreamingResponse(io.BytesIO(encode.tobytes()), media_type=content_type)
+
+    dato = b64encode(encode).decode('utf-8')
+    data = [
+        {
+            "data": dato,
+            'type': content_type
+        },
+        {
+            "data": dato,
+            'type': content_type
+        },
+        {
+            "data": dato,
+            'type': content_type
+        }
+    ]
+    
+    return data

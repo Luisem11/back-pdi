@@ -14,7 +14,7 @@ services:
       - 10010:10002
     environment:
       - TESTING=0
-      - DEBUGGER=false
+      - DEBUGGER=True
       - WEB_APP_VERSION=0.0.0
       - WEB_APP_TITLE=Algaes project
       - WEB_APP_DESCRIPTION=PDI project
