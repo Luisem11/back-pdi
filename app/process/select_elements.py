@@ -37,4 +37,4 @@ def selectElements(img, convex_hull=False, contours=False, show_number=False):
 
         cv2.putText(img_copy, f"{i+1}", (cx-25, cy-25), font, 0.9,(255,255,0), 4)
   else:
-    return img_copy
+    return img_copy, img_copy
