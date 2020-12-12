@@ -1,6 +1,6 @@
-
+from app.process.select_elements import selectElements
 from app.process.decode import decode_image
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, Form
 from fastapi.responses import StreamingResponse
 
 import cv2
@@ -52,6 +52,34 @@ async def process_image(file: UploadFile= File(...)):
     flag, encode = cv2.imencode(f".{extention}", img_copy)        
     return StreamingResponse(io.BytesIO(encode.tobytes()), media_type=content_type)
 
+
+
+
+@router.post("/type2")
+async def process_image(
+    convex_hull: bool = Form(True), 
+    contour: bool = Form(False),
+    number: bool = Form(False),
+    file: UploadFile= File(...)
+):
+
+    print("Getting image information...")
+    content_type, extention, image = decode_image(file)
+    # Process image
+    img = selectElements(image, convex_hull, contour, number)
+
+    # enconde data
+    flag, encode = cv2.imencode(f".{extention}", img)
+
+    dato = b64encode(encode).decode('utf-8')
+    data = [
+        {
+            "data": dato,
+            'type': content_type
+        }
+    ]
+    
+    return data
 
 
 @router.post("/base")
