@@ -10,25 +10,27 @@ from base64 import b64encode
 
 router = APIRouter()
 
+
 @router.get("")
 async def get_basic_information():
     return "hello world"
 
 
 @router.post("/type1")
-async def process_image(file: UploadFile= File(...)):
+async def process_image(file: UploadFile = File(...)):
     print("Getting image information...")
     content_type, extention, image = decode_image(file)
     # Process image
     print("Init images process...")
-    imagensita = cv2.fastNlMeansDenoisingColored(image, None, 12,12,10,28)
+    imagensita = cv2.fastNlMeansDenoisingColored(image, None, 12, 12, 10, 28)
     gray = cv2.cvtColor(imagensita, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray,80,200)
-    
-    kernel_closi = np.ones((5,5),np.uint8)
-    closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel_closi, iterations=4)
+    edges = cv2.Canny(gray, 80, 200)
+
+    kernel_closi = np.ones((5, 5), np.uint8)
+    closing = cv2.morphologyEx(
+        edges, cv2.MORPH_CLOSE, kernel_closi, iterations=4)
     img_copy = image.copy()
-    contours,hierarchy = cv2.findContours(closing, 1, cv2.CHAIN_APPROX_NONE)
+    contours, hierarchy = cv2.findContours(closing, 1, cv2.CHAIN_APPROX_NONE)
 
     areas = []
     hull = []
@@ -44,53 +46,67 @@ async def process_image(file: UploadFile= File(...)):
 
     print("Drawing contours...")
     for i in range(len(contours)):
-        if i == max_val: continue
-        cv2.drawContours(img_copy, contours, i, (0,255,0), 2,cv2.LINE_8, hierarchy, 100)
-        cv2.drawContours(img_copy, hull, i, (255,0,0), 3, 8)
+        if i == max_val:
+            continue
+        cv2.drawContours(img_copy, contours, i, (0, 255, 0),
+                         2, cv2.LINE_8, hierarchy, 100)
+        cv2.drawContours(img_copy, hull, i, (255, 0, 0), 3, 8)
 
     # enconde data
-    flag, encode = cv2.imencode(f".{extention}", img_copy)        
+    flag, encode = cv2.imencode(f".{extention}", img_copy)
     return StreamingResponse(io.BytesIO(encode.tobytes()), media_type=content_type)
-
-
 
 
 @router.post("/type2")
 async def process_image(
-    convex_hull: bool = Form(True), 
-    contour: bool = Form(False),
-    number: bool = Form(False),
-    file: UploadFile= File(...)
+    file: UploadFile = File(...)
 ):
 
     print("Getting image information...")
     content_type, extention, image = decode_image(file)
     # Process image
-    img = selectElements(image, convex_hull, contour, number)
+    img_c, img_cH, img_center, img_kmeans = selectElements(image)
 
     # enconde data
-    flag, encode = cv2.imencode(f".{extention}", img)
+    flag_c, encode_c = cv2.imencode(f".{extention}", img_c)
+    flag_cH, encode_cH = cv2.imencode(f".{extention}", img_cH)
+    flag_center, encode_center = cv2.imencode(f".{extention}", img_center)
+    flag_kmeans, encode_kmeans = cv2.imencode(f".{extention}", img_kmeans)
 
-    dato = b64encode(encode).decode('utf-8')
-    data = [
-        {
-            "data": dato,
+    dato_c = b64encode(encode_c).decode('utf-8')
+    dato_cH = b64encode(encode_cH).decode('utf-8')
+    dato_center = b64encode(encode_center).decode('utf-8')
+    dato_kmeans = b64encode(encode_kmeans).decode('utf-8')
+    data = {
+        "contourns": {
+            "data": dato_c,
+            'type': content_type
+        },
+        "convexHull": {
+            "data": dato_cH,
+            'type': content_type
+        },
+        "centers": {
+            "data": dato_center,
+            'type': content_type
+        },
+        'kmeans':  {
+            "data": dato_kmeans,
             'type': content_type
         }
-    ]
-    
+    }
+
     return data
 
 
 @router.post("/base")
-async def process_image(file: UploadFile= File(...)):
+async def process_image(file: UploadFile = File(...)):
     print("Getting image information...")
     content_type, extention, image = decode_image(file)
     # Process image
 
-
     # enconde data
-    flag, encode = cv2.imencode(f".{extention}", image)        
+    flag, encode = cv2.imencode(f".{extention}", image)
     # return StreamingResponse(io.BytesIO(encode.tobytes()), media_type=content_type)
 
     dato = b64encode(encode).decode('utf-8')
@@ -108,5 +124,5 @@ async def process_image(file: UploadFile= File(...)):
             'type': content_type
         }
     ]
-    
+
     return data
