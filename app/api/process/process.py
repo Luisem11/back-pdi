@@ -58,7 +58,7 @@ async def process_image(file: UploadFile = File(...)):
 
 
 @router.post("/type2")
-async def process_image(
+async def process_image1(
     file: UploadFile = File(...)
 ):
 
@@ -66,14 +66,16 @@ async def process_image(
     content_type, extention, image = decode_image(file)
     print(content_type, extention)
     # Process image
+    print("processing image")
     img_c, img_cH, img_center, img_kmeans, img_cseg = selectElements(image)
 
     # enconde data
-    flag_c, encode_c = cv2.imencode(f".png", img_c)
-    flag_cH, encode_cH = cv2.imencode(f".png", img_cH)
-    flag_center, encode_center = cv2.imencode(f".png", img_center)
-    flag_kmeans, encode_kmeans = cv2.imencode(f".png", img_kmeans)
-    flag_cseg, encode_cseg = cv2.imencode(f".png", img_cseg)
+    print("encoding images")
+    _, encode_c = cv2.imencode(f".png", img_c)
+    _, encode_cH = cv2.imencode(f".png", img_cH)
+    _, encode_center = cv2.imencode(f".png", img_center)
+    _, encode_kmeans = cv2.imencode(f".png", img_kmeans)
+    _, encode_cseg = cv2.imencode(f".png", img_cseg)
 
     dato_c = b64encode(encode_c).decode('utf-8')
     dato_cH = b64encode(encode_cH).decode('utf-8')

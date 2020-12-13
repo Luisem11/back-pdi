@@ -10,6 +10,7 @@ def selectElements(img):
     stop_criteria = (cv2.TERM_CRITERIA_EPS +
                      cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
     centroid_initialization_strategy = cv2.KMEANS_RANDOM_CENTERS
+    print("getting kmeans information")
     _, labels, centers = cv2.kmeans(pixel_values,
                                     5,
                                     None,
@@ -44,6 +45,7 @@ def selectElements(img):
     areas = []
     hull = []
     font = cv2.FONT_HERSHEY_SIMPLEX
+    print("creating contours, convex hull")
     for i, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         areas.append(area)
@@ -53,6 +55,7 @@ def selectElements(img):
     max_val = np.argmax(areas)
     areas[max_val] = 0
 
+    print("Drawing contours, convex hull")
     for i in range(len(contours)):
         cv2.drawContours(final_mask_c, contours, i,
                          (10, 108, 28), 2, cv2.LINE_8, hierarchy, 100)
