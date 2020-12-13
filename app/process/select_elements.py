@@ -23,6 +23,7 @@ def selectElements(img):
     # Identify objects
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 80, 200)
+    edges_final = edges.copy()
 
     kernel = np.ones((3, 3), np.uint8)
     kernel_closi = np.ones((5, 5), np.uint8)
@@ -85,4 +86,4 @@ def selectElements(img):
     for i in range(len(result[0])-1):
         final_mask_centers[result[0][i], result[1][i], 3] = 255
 
-    return final_mask_c, final_mask_cH, final_mask_centers, segmented_image
+    return final_mask_c, final_mask_cH, final_mask_centers, segmented_image, edges_final

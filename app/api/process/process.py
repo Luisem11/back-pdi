@@ -66,18 +66,20 @@ async def process_image(
     content_type, extention, image = decode_image(file)
     print(content_type, extention)
     # Process image
-    img_c, img_cH, img_center, img_kmeans = selectElements(image)
+    img_c, img_cH, img_center, img_kmeans, img_cseg = selectElements(image)
 
     # enconde data
     flag_c, encode_c = cv2.imencode(f".png", img_c)
     flag_cH, encode_cH = cv2.imencode(f".png", img_cH)
     flag_center, encode_center = cv2.imencode(f".png", img_center)
     flag_kmeans, encode_kmeans = cv2.imencode(f".png", img_kmeans)
+    flag_cseg, encode_cseg = cv2.imencode(f".png", img_cseg)
 
     dato_c = b64encode(encode_c).decode('utf-8')
     dato_cH = b64encode(encode_cH).decode('utf-8')
     dato_center = b64encode(encode_center).decode('utf-8')
     dato_kmeans = b64encode(encode_kmeans).decode('utf-8')
+    dato_cseg = b64encode(encode_cseg).decode('utf-8')
     data = {
         "contourns": {
             "data": dato_c,
@@ -93,6 +95,10 @@ async def process_image(
         },
         'kmeans':  {
             "data": dato_kmeans,
+            'type': 'image/png'
+        },
+        'colorSeg':  {
+            "data": dato_cseg,
             'type': 'image/png'
         }
     }
