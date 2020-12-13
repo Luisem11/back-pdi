@@ -64,14 +64,15 @@ async def process_image(
 
     print("Getting image information...")
     content_type, extention, image = decode_image(file)
+    print(content_type, extention)
     # Process image
     img_c, img_cH, img_center, img_kmeans = selectElements(image)
 
     # enconde data
-    flag_c, encode_c = cv2.imencode(f".{extention}", img_c)
-    flag_cH, encode_cH = cv2.imencode(f".{extention}", img_cH)
-    flag_center, encode_center = cv2.imencode(f".{extention}", img_center)
-    flag_kmeans, encode_kmeans = cv2.imencode(f".{extention}", img_kmeans)
+    flag_c, encode_c = cv2.imencode(f".png", img_c)
+    flag_cH, encode_cH = cv2.imencode(f".png", img_cH)
+    flag_center, encode_center = cv2.imencode(f".png", img_center)
+    flag_kmeans, encode_kmeans = cv2.imencode(f".png", img_kmeans)
 
     dato_c = b64encode(encode_c).decode('utf-8')
     dato_cH = b64encode(encode_cH).decode('utf-8')
@@ -80,19 +81,19 @@ async def process_image(
     data = {
         "contourns": {
             "data": dato_c,
-            'type': content_type
+            'type': 'image/png'
         },
         "convexHull": {
             "data": dato_cH,
-            'type': content_type
+            'type': 'image/png'
         },
         "centers": {
             "data": dato_center,
-            'type': content_type
+            'type': 'image/png'
         },
         'kmeans':  {
             "data": dato_kmeans,
-            'type': content_type
+            'type': 'image/png'
         }
     }
 
