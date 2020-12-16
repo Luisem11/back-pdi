@@ -56,7 +56,8 @@ def selectElements(img):
     areas[max_val] = 0
 
     print("Drawing contours, convex hull")
-    for i in range(len(contours)):
+    contours_lengh = len(contours)
+    for i in range(contours_lengh):
         cv2.drawContours(final_mask_c, contours, i,
                          (10, 108, 28), 2, cv2.LINE_8, hierarchy, 100)
         cv2.drawContours(final_mask_cH, hull, i, (255, 1, 1), 3, 8)
@@ -65,8 +66,9 @@ def selectElements(img):
         m00 = M['m00'] if M['m00'] else 1
         cx = int(M['m10']/m00)
         cy = int(M['m01']/m00)
-        cv2.putText(final_mask_centers,
-                    f"{i+1}", (cx-25, cy-25), font, 0.9, (255, 254, 0), 4)
+        final_mask_centers=cv2.circle(final_mask_centers, (cx, cy), 10,(255, 254, 0), -1)
+
+    cv2.putText(final_mask_centers, f"Objects: {len(contours)}", (150, 250), font, 5,(0,255,0), 4)
 
     arr1 = np.array(final_mask_c)
     arr2 = np.array(final_mask_cH)
@@ -76,6 +78,7 @@ def selectElements(img):
     final_mask_centers = cv2.cvtColor(
         final_mask_centers, cv2.COLOR_BGR2RGBA)
     segmented_image = cv2.cvtColor(segmented_image, cv2.COLOR_BGR2RGBA)
+
     final_mask_c[:, :, 3] = 0
     final_mask_cH[:, :, 3] = 0
     final_mask_centers[:, :, 3] = 0
@@ -88,5 +91,7 @@ def selectElements(img):
     result = np.where(arr3 == 255)
     for i in range(len(result[0])-1):
         final_mask_centers[result[0][i], result[1][i], 3] = 255
+    
+
 
     return final_mask_c, final_mask_cH, final_mask_centers, segmented_image, edges_final
