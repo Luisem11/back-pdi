@@ -1,3 +1,4 @@
+#Importación de librerias
 import cv2
 import numpy as np
 
@@ -5,12 +6,14 @@ import numpy as np
 def selectElements(img):
     # Kmeans segmentation
     image_copy = img.copy()
+    #inicializacion de los parametros para usar kmeans
     pixel_values = image_copy.reshape((-1, 3))
     pixel_values = np.float32(pixel_values)
     stop_criteria = (cv2.TERM_CRITERIA_EPS +
                      cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
     centroid_initialization_strategy = cv2.KMEANS_RANDOM_CENTERS
     print("getting kmeans information")
+    #se genera el kmeans de la imagen
     _, labels, centers = cv2.kmeans(pixel_values,
                                     5,
                                     None,
@@ -23,9 +26,11 @@ def selectElements(img):
 
     # Identify objects
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #Generación de bordes de la imagen
     edges = cv2.Canny(gray, 80, 200)
     edges_final = edges.copy()
 
+    #aplicación de close y open para eliminar ruido
     kernel = np.ones((3, 3), np.uint8)
     kernel_closi = np.ones((5, 5), np.uint8)
     closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE,
@@ -47,8 +52,10 @@ def selectElements(img):
     font = cv2.FONT_HERSHEY_SIMPLEX
     print("creating contours, convex hull")
     for i, contour in enumerate(contours):
+        #Obtencion de area por los contornos
         area = cv2.contourArea(contour)
         areas.append(area)
+        #Obtencion de convex hull por los contornos
         convex = cv2.convexHull(contours[i], False)
         hull.append(convex)
 
@@ -58,16 +65,22 @@ def selectElements(img):
     print("Drawing contours, convex hull")
     contours_lengh = len(contours)
     for i in range(contours_lengh):
+        #Dibujado de los contornos por cada contorno
         cv2.drawContours(final_mask_c, contours, i,
                          (10, 108, 28), 2, cv2.LINE_8, hierarchy, 100)
+        #Dibujado de los convex hull por cada contorno
         cv2.drawContours(final_mask_cH, hull, i, (255, 1, 1), 3, 8)
 
+        #calculo de los momentos de cada contorno
         M = cv2.moments(contours[i])
         m00 = M['m00'] if M['m00'] else 1
+        # Obtencion de los centroides de cada elemento por su contorno
         cx = int(M['m10']/m00)
         cy = int(M['m01']/m00)
+        # Dibujar un circulo en cada centro obtenido
         final_mask_centers=cv2.circle(final_mask_centers, (cx, cy), 10,(255, 254, 0), -1)
 
+    #Dibujado de la cantidad de elementos detectados
     cv2.putText(final_mask_centers, f"Objects: {len(contours)}", (150, 250), font, 5,(0,255,0), 4)
 
     arr1 = np.array(final_mask_c)
